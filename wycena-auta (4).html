@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wycena Twojego samochodu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --border: #2e2e2e;
+    --accent: #e8ff47;
+    --accent-dark: #c8df27;
+    --text: #f0f0f0;
+    --text-muted: #888;
+    --text-dim: #555;
+    --red: #ff4d4d;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .hero {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* STEPS BAR */
+  .steps-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 28px 24px 0;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .step-item:last-child .step-line { display: none; }
+
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: all .3s;
+  }
+
+  .step-dot.active { background: var(--accent); border-color: var(--accent); color: #000; }
+  .step-dot.done { background: var(--accent); border-color: var(--accent); color: #000; }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color .3s;
+  }
+
+  .step-item.active .step-label { color: var(--text); }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
+
+  /* FORM WRAPPER */
+  .form-wrap {
+    max-width: 680px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+  }
+
+  /* SECTIONS */
+  .section {
+    display: none;
+    animation: fadeIn .35s ease;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  /* FIELDS */
+  .field { margin-bottom: 20px; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: .02em;
+  }
+
+  .field label .req { color: var(--accent); margin-left: 2px; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232,255,71,.1);
+  }
+
+  .field input.error,
+  .field select.error,
+  .field textarea.error {
+    border-color: var(--red);
+  }
+
+  .field textarea { resize: vertical; min-height: 90px; }
+
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  .field select option { background: #222; }
+
+  /* RADIO GROUP */
+  .radio-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+
+  .radio-option:hover { border-color: #444; }
+  .radio-option.selected { border-color: var(--accent); background: rgba(232,255,71,.05); }
+
+  .radio-option input[type=radio] { display: none; }
+
+  .radio-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s;
+  }
+
+  .radio-option.selected .radio-dot { border-color: var(--accent); }
+
+  .radio-dot::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: none;
+  }
+
+  .radio-option.selected .radio-dot::after { display: block; }
+  .radio-option span { font-size: 14px; font-weight: 500; }
+
+  /* TWO COLS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* FILE UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+
+  .upload-zone:hover { border-color: var(--accent); background: rgba(232,255,71,.03); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+  .upload-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .upload-zone p { color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+  .upload-zone strong { color: var(--text); font-size: 14px; display: block; margin-bottom: 4px; }
+
+  .file-list { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .file-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .file-chip button {
+    background: none; border: none; color: var(--red); cursor: pointer; font-size: 14px; line-height: 1;
+  }
+
+  .img-preview-list { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .img-thumb {
+    width: 80px; height: 80px; border-radius: 8px; object-fit: cover;
+    border: 1.5px solid var(--border);
+    position: relative;
+  }
+  .img-thumb-wrap { position: relative; }
+  .img-thumb-wrap button {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--red); border: none; color: #fff;
+    border-radius: 50%; width: 20px; height: 20px;
+    font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* NAV BUTTONS */
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-back {
+    flex: 0 0 auto;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    border-radius: var(--radius);
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+
+  .btn-back:hover { border-color: #555; color: var(--text); }
+
+  .btn-next {
+    flex: 1;
+    background: var(--accent);
+    border: none;
+    color: #000;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    letter-spacing: .01em;
+  }
+
+  .btn-next:hover { background: var(--accent-dark); }
+  .btn-next:active { transform: scale(.98); }
+  .btn-next:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* PROGRESS BAR */
+  .progress-track {
+    max-width: 680px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  /* SUCCESS */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .success-screen.active { display: block; }
+
+  .success-icon {
+    width: 80px; height: 80px;
+    background: rgba(232,255,71,.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 28px;
+    border: 2px solid var(--accent);
+  }
+
+  .success-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  .success-screen p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* HINT TEXT */
+  .hint { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+
+  /* SENDING OVERLAY */
+  .sending-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  .sending-overlay.active { display: flex; }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sending-overlay p { color: var(--text); font-size: 14px; }
+
+  /* ERROR MSG */
+  .error-msg { color: var(--red); font-size: 12px; margin-top: 6px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* REQUIRED note */
+  .req-note { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+  .req-note span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Formularz wyceny</div>
+  <h1>Oceń swoje auto.<br><span>Szybko i bez wychodzenia z domu.</span></h1>
+  <p>Uzupełnij poniższe dane, a wycenę otrzymasz bezpośrednio od doradcy — bez zobowiązań.</p>
+</div>
+
+<!-- STEPS -->
+<div class="steps-bar">
+  <div class="step-item active" id="si-1">
+    <div class="step-dot active" id="sd-1">1</div>
+    <div class="step-label">Dane pojazdu</div>
+    <div class="step-line"></div>
+  </div>
+  <div class="step-item" id="si-2">
+    <div class="step-dot" id="sd-2">2</div>
+    <div class="step-label">Historia & stan</div>
+    <div class="step-line"></div>
+  </div>
+  <div class="step-item" id="si-3">
+    <div class="step-dot" id="sd-3">3</div>
+    <div class="step-label">Zdjęcia</div>
+    <div class="step-line"></div>
+  </div>
+  <div class="step-item" id="si-4">
+    <div class="step-dot" id="sd-4">4</div>
+    <div class="step-label">Kontakt</div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-track">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:25%"></div>
+  </div>
+</div>
+
+<div class="form-wrap">
+  <p class="req-note"><span>*</span> — pola wymagane</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section active" id="sec-1">
+    <div class="section-title">Dane pojazdu</div>
+    <div class="section-desc">Podstawowe informacje potrzebne do wstępnej wyceny.</div>
+
+    <div class="field">
+      <label>Numer VIN <span class="req">*</span></label>
+      <input type="text" id="vin" placeholder="np. WBA3A5C50DF123456" maxlength="17">
+      <div class="hint">17-znakowy numer identyfikacyjny pojazdu</div>
+      <div class="error-msg" id="err-vin">Proszę podać numer VIN.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Rok produkcji <span class="req">*</span></label>
+        <input type="number" id="rok" placeholder="np. 2019" min="1990" max="2025">
+        <div class="error-msg" id="err-rok">Proszę podać rok produkcji.</div>
+      </div>
+      <div class="field">
+        <label>Pierwsza rejestracja <span class="req">*</span></label>
+        <input type="date" id="rejestracja">
+        <div class="error-msg" id="err-rej">Proszę podać datę rejestracji.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Przebieg (km) <span class="req">*</span></label>
+      <input type="number" id="przebieg" placeholder="np. 85000">
+      <div class="error-msg" id="err-przebieg">Proszę podać przebieg.</div>
+    </div>
+
+    <div class="field">
+      <label>Sposób sprzedaży <span class="req">*</span></label>
+      <div class="radio-group" id="sprzedaz-group">
+        <label class="radio-option" onclick="selectRadio(this,'sprzedaz')">
+          <input type="radio" name="sprzedaz" value="Faktura VAT">
+          <div class="radio-dot"></div>
+          <span>Faktura VAT</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'sprzedaz')">
+          <input type="radio" name="sprzedaz" value="Faktura VAT ZW">
+          <div class="radio-dot"></div>
+          <span>Faktura VAT ZW</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'sprzedaz')">
+          <input type="radio" name="sprzedaz" value="Osoba prywatna">
+          <div class="radio-dot"></div>
+          <span>Osoba prywatna</span>
+        </label>
+      </div>
+      <div class="error-msg" id="err-sprzedaz">Proszę wybrać sposób sprzedaży.</div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-next" onclick="goTo(2)">Dalej →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section" id="sec-2">
+    <div class="section-title">Historia i stan techniczny</div>
+    <div class="section-desc">Szczegóły wpływające na wycenę Twojego pojazdu.</div>
+
+    <div class="field">
+      <label>Którym jest Pan/Pani właścicielem? <span class="req">*</span></label>
+      <select id="wlasciciel">
+        <option value="">— wybierz —</option>
+        <option>Pierwszy</option>
+        <option>Drugi</option>
+        <option>Trzeci</option>
+        <option>Czwarty lub kolejny</option>
+      </select>
+      <div class="error-msg" id="err-wlasciciel">Proszę wybrać kolejność właściciela.</div>
+    </div>
+
+    <div class="field">
+      <label>Samochód z polskiego salonu? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option" onclick="selectRadio(this,'salon')">
+          <input type="radio" name="salon" value="Tak">
+          <div class="radio-dot"></div><span>Tak</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'salon')">
+          <input type="radio" name="salon" value="Nie">
+          <div class="radio-dot"></div><span>Nie</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'salon')">
+          <input type="radio" name="salon" value="Nie wiem">
+          <div class="radio-dot"></div><span>Nie wiem</span>
+        </label>
+      </div>
+      <div class="error-msg" id="err-salon">Proszę wybrać odpowiedź.</div>
+    </div>
+
+    <div class="field">
+      <label>Serwisowany tylko w ASO? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option" onclick="selectRadio(this,'aso')">
+          <input type="radio" name="aso" value="Tak, wyłącznie ASO">
+          <div class="radio-dot"></div><span>Tak, wyłącznie ASO</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'aso')">
+          <input type="radio" name="aso" value="Częściowo ASO">
+          <div class="radio-dot"></div><span>Częściowo ASO</span>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this,'aso')">
+          <input type="radio" name="aso" value="Nie, serwis poza ASO">
+          <div class="radio-dot"></div><span>Nie, serwis poza ASO</span>
+        </label>
+      </div>
+      <div class="error-msg" id="err-aso">Proszę wybrać odpowiedź.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Książka serwisowa? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-option" onclick="selectRadio(this,'ksiazka')">
+            <input type="radio" name="ksiazka" value="Tak">
+            <div class="radio-dot"></div><span>Tak</span>
+          </label>
+          <label class="radio-option" onclick="selectRadio(this,'ksiazka')">
+            <input type="radio" name="ksiazka" value="Nie">
+            <div class="radio-dot"></div><span>Nie</span>
+          </label>
+        </div>
+        <div class="error-msg" id="err-ksiazka">Proszę wybrać odpowiedź.</div>
+      </div>
+      <div class="field">
+        <label>Drugi komplet opon/kół? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-option" onclick="selectRadio(this,'opony')">
+            <input type="radio" name="opony" value="Tak">
+            <div class="radio-dot"></div><span>Tak</span>
+          </label>
+          <label class="radio-option" onclick="selectRadio(this,'opony')">
+            <input type="radio" name="opony" value="Nie">
+            <div class="radio-dot"></div><span>Nie</span>
+          </label>
+        </div>
+        <div class="error-msg" id="err-opony">Proszę wybrać odpowiedź.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Naprawy blacharsko-lakiernicze?</label>
+      <textarea id="blacharstwo" placeholder="Opisz ewentualne naprawy (np. przedni zderzak, lewe drzwi) lub wpisz 'Brak'"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Oczekiwana kwota <span class="req">*</span></label>
+      <input type="text" id="kwota" placeholder="np. 45 000 zł lub 'otwarte na ofertę'">
+      <div class="error-msg" id="err-kwota">Proszę podać oczekiwaną kwotę.</div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(1)">← Wróć</button>
+      <button class="btn-next" onclick="goTo(3)">Dalej →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section" id="sec-3">
+    <div class="section-title">Zdjęcia</div>
+    <div class="section-desc">Dodaj min. 3 zdjęcia auta oraz obie strony dowodu rejestracyjnego. Możesz użyć zdjęć ze smartfona.</div>
+
+    <div class="field">
+      <label>Zdjęcia samochodu <span class="req">*</span></label>
+      <div class="upload-zone" id="zone-auto">
+        <input type="file" accept="image/*" multiple onchange="handleFiles(event,'auto')" id="input-auto">
+        <div class="upload-icon">📸</div>
+        <strong>Kliknij lub przeciągnij zdjęcia tutaj</strong>
+        <p>Przekątna z przodu, z tyłu, wnętrze, ewentualne uszkodzenia<br>Min. 3 zdjęcia · JPG, PNG, HEIC</p>
+      </div>
+      <div class="img-preview-list" id="preview-auto"></div>
+      <div class="error-msg" id="err-auto">Proszę dodać min. 3 zdjęcia samochodu.</div>
+    </div>
+
+    <div class="field">
+      <label>Dowód rejestracyjny — obie strony <span class="req">*</span></label>
+      <div class="upload-zone" id="zone-dr">
+        <input type="file" accept="image/*" multiple onchange="handleFiles(event,'dr')" id="input-dr">
+        <div class="upload-icon">📄</div>
+        <strong>Kliknij lub przeciągnij zdjęcia tutaj</strong>
+        <p>Awers i rewers dowodu rejestracyjnego</p>
+      </div>
+      <div class="img-preview-list" id="preview-dr"></div>
+      <div class="error-msg" id="err-dr">Proszę dodać zdjęcia dowodu rejestracyjnego.</div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(2)">← Wróć</button>
+      <button class="btn-next" onclick="goTo(4)">Dalej →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section" id="sec-4">
+    <div class="section-title">Dane kontaktowe</div>
+    <div class="section-desc">Podaj adres email, na który możesz oczekiwać wyceny.</div>
+
+    <div class="field">
+      <label>Imię i nazwisko <span class="req">*</span></label>
+      <input type="text" id="imie" placeholder="Jan Kowalski">
+      <div class="error-msg" id="err-imie">Proszę podać imię i nazwisko.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="jan@kowalski.pl">
+        <div class="error-msg" id="err-email">Proszę podać poprawny adres email.</div>
+      </div>
+      <div class="field">
+        <label>Telefon</label>
+        <input type="tel" id="telefon" placeholder="+48 500 000 000">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Link do ogłoszenia otomoto (opcjonalnie)</label>
+      <input type="url" id="otomoto" placeholder="https://www.otomoto.pl/osobowe/...">
+    </div>
+
+    <hr class="divider">
+
+    <!-- SUMMARY -->
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px;">Podsumowanie</div>
+      <div id="summary" style="font-size:13px;color:var(--text-muted);line-height:2;"></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(3)">← Wróć</button>
+      <button class="btn-next" id="submitBtn" onclick="submitForm()">Wyślij do wyceny ✓</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="success">
+    <div class="success-icon">✓</div>
+    <h2>Formularz wysłany!</h2>
+    <p>Dziękujemy za przesłanie danych. Skontaktujemy się z Tobą najszybciej jak to możliwe z wyceną Twojego samochodu.</p>
+  </div>
+</div>
+
+<!-- SENDING OVERLAY -->
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <p>Wysyłanie formularza…</p>
+</div>
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+// =============================================
+// KONFIGURACJA — uzupełnij przed użyciem
+// =============================================
+const TARGET_EMAIL       = 'andrzej.bmw.inchcape@gmail.com';
+const EMAILJS_SERVICE_ID  = 'service_fqu9gyn';
+const EMAILJS_TEMPLATE_ID = 'template_cnfrnrb';
+const EMAILJS_PUBLIC_KEY  = 'DqnWEW7VO63_xlpuc';
+// =============================================
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+let currentStep = 1;
+const totalSteps = 4;
+const filesMap = { auto: [], dr: [] };
+
+function goTo(step) {
+  if (step > currentStep && !validateStep(currentStep)) return;
+  if (step === 4) buildSummary();
+
+  document.getElementById('sec-' + currentStep).classList.remove('active');
+  document.getElementById('si-' + currentStep).classList.remove('active');
+  if (step > currentStep) {
+    document.getElementById('sd-' + currentStep).classList.add('done');
+    document.getElementById('sd-' + currentStep).textContent = '✓';
+  } else {
+    document.getElementById('sd-' + currentStep).classList.remove('done');
+    document.getElementById('sd-' + currentStep).textContent = currentStep;
+  }
+
+  currentStep = step;
+  document.getElementById('sec-' + currentStep).classList.add('active');
+  document.getElementById('si-' + currentStep).classList.add('active');
+  document.getElementById('sd-' + currentStep).classList.add('active');
+
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep(step) {
+  let ok = true;
+  const show = (id) => { document.getElementById(id).classList.add('show'); ok = false; };
+  const hide = (id) => document.getElementById(id).classList.remove('show');
+  const val = (id) => document.getElementById(id)?.value.trim();
+  const radio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value;
+
+  if (step === 1) {
+    if (!val('vin')) show('err-vin'); else hide('err-vin');
+    if (!val('rok')) show('err-rok'); else hide('err-rok');
+    if (!val('rejestracja')) show('err-rej'); else hide('err-rej');
+    if (!val('przebieg')) show('err-przebieg'); else hide('err-przebieg');
+    if (!radio('sprzedaz')) show('err-sprzedaz'); else hide('err-sprzedaz');
+  }
+
+  if (step === 2) {
+    if (!val('wlasciciel')) show('err-wlasciciel'); else hide('err-wlasciciel');
+    if (!radio('salon')) show('err-salon'); else hide('err-salon');
+    if (!radio('aso')) show('err-aso'); else hide('err-aso');
+    if (!radio('ksiazka')) show('err-ksiazka'); else hide('err-ksiazka');
+    if (!radio('opony')) show('err-opony'); else hide('err-opony');
+    if (!val('kwota')) show('err-kwota'); else hide('err-kwota');
+  }
+
+  if (step === 3) {
+    if (filesMap.auto.length < 3) show('err-auto'); else hide('err-auto');
+    if (filesMap.dr.length < 1) show('err-dr'); else hide('err-dr');
+  }
+
+  if (step === 4) {
+    if (!val('imie')) show('err-imie'); else hide('err-imie');
+    const emailVal = val('email');
+    if (!emailVal || !/^\S+@\S+\.\S+$/.test(emailVal)) show('err-email'); else hide('err-email');
+  }
+
+  return ok;
+}
+
+function selectRadio(el, name) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+    r.closest('.radio-option').classList.remove('selected');
+  });
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+
+function handleFiles(e, key) {
+  const newFiles = Array.from(e.target.files);
+  filesMap[key].push(...newFiles);
+  renderPreviews(key);
+}
+
+function renderPreviews(key) {
+  const container = document.getElementById('preview-' + key);
+  container.innerHTML = '';
+  filesMap[key].forEach((file, idx) => {
+    const url = URL.createObjectURL(file);
+    const wrap = document.createElement('div');
+    wrap.className = 'img-thumb-wrap';
+    wrap.innerHTML = `<img class="img-thumb" src="${url}"><button onclick="removeFile('${key}',${idx})">×</button>`;
+    container.appendChild(wrap);
+  });
+}
+
+function removeFile(key, idx) {
+  filesMap[key].splice(idx, 1);
+  renderPreviews(key);
+}
+
+function getRadio(name) {
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || '—';
+}
+
+function buildSummary() {
+  const lines = [
+    ['VIN', document.getElementById('vin').value],
+    ['Rok produkcji', document.getElementById('rok').value],
+    ['Pierwsza rejestracja', document.getElementById('rejestracja').value],
+    ['Przebieg', document.getElementById('przebieg').value + ' km'],
+    ['Sposób sprzedaży', getRadio('sprzedaz')],
+    ['Kolejny właściciel', document.getElementById('wlasciciel').value],
+    ['Polski salon', getRadio('salon')],
+    ['Serwis ASO', getRadio('aso')],
+    ['Książka serwisowa', getRadio('ksiazka')],
+    ['Drugi komplet opon', getRadio('opony')],
+    ['Oczekiwana kwota', document.getElementById('kwota').value],
+    ['Zdjęcia auta', filesMap.auto.length + ' szt.'],
+    ['Zdjęcia dowodu rej.', filesMap.dr.length + ' szt.'],
+  ];
+
+  document.getElementById('summary').innerHTML = lines.map(([k, v]) =>
+    `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:4px 0">
+      <span style="color:var(--text-dim)">${k}</span>
+      <span style="color:var(--text);font-weight:500">${v || '—'}</span>
+    </div>`
+  ).join('');
+}
+
+// Klucz API ImgBB — darmowy hosting zdjęć (zarejestruj się na imgbb.com)
+const IMGBB_API_KEY = '298f5ed8842d7c96942d4aadbc9e433f';
+
+// Kompresuje zdjęcie i zwraca base64 (bez prefixu data:...)
+async function compressToBase64(file, maxWidth = 1200, quality = 0.7) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      // zwróć samo base64 bez "data:image/jpeg;base64,"
+      res(canvas.toDataURL('image/jpeg', quality).split(',')[1]);
+    };
+    img.onerror = rej;
+    img.src = url;
+  });
+}
+
+// Wysyła jedno zdjęcie na ImgBB i zwraca publiczny URL
+async function uploadToImgBB(file) {
+  const b64 = await compressToBase64(file);
+  const formData = new FormData();
+  formData.append('image', b64);
+  const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await resp.json();
+  if (data.success) return data.data.url;
+  throw new Error('ImgBB upload failed: ' + JSON.stringify(data));
+}
+
+async function submitForm() {
+  if (!validateStep(4)) return;
+
+  document.getElementById('sendingOverlay').classList.add('active');
+  document.getElementById('submitBtn').disabled = true;
+
+  const radio = (n) => document.querySelector(`input[name="${n}"]:checked`)?.value || '—';
+  const v = (id) => document.getElementById(id)?.value.trim() || '—';
+
+  // Wgraj zdjęcia na ImgBB i zbierz URL-e
+  const allFiles = [...filesMap.auto, ...filesMap.dr];
+  let imageLinks = '';
+  let imageHtml = '';
+
+  document.querySelector('#sendingOverlay p').textContent = 'Wysyłanie zdjęć… (może chwilę potrwać)';
+
+  for (let i = 0; i < allFiles.length; i++) {
+    try {
+      const url = await uploadToImgBB(allFiles[i]);
+      const label = i < filesMap.auto.length
+        ? `Samochód ${i + 1}`
+        : `Dowód rej. ${i - filesMap.auto.length + 1}`;
+      imageLinks += `${label}: ${url}\n`;
+      imageHtml += `<div style="margin:8px 0"><strong>${label}:</strong><br>
+        <a href="${url}"><img src="${url}" style="max-width:400px;border-radius:8px;margin-top:4px;"></a></div>`;
+    } catch (e) {
+      imageLinks += `Zdjęcie ${i+1}: błąd przesyłania\n`;
+    }
+  }
+
+  const body = `WYCENA SAMOCHODU
+================
+
+📋 DANE POJAZDU
+VIN:                    ${v('vin')}
+Rok produkcji:          ${v('rok')}
+Pierwsza rejestracja:   ${v('rejestracja')}
+Przebieg:               ${v('przebieg')} km
+Sposób sprzedaży:       ${radio('sprzedaz')}
+
+🔧 HISTORIA I STAN
+Właściciel:             ${v('wlasciciel')}
+Polski salon:           ${radio('salon')}
+Serwis ASO:             ${radio('aso')}
+Książka serwisowa:      ${radio('ksiazka')}
+Drugi komplet opon:     ${radio('opony')}
+Naprawy blacharskie:    ${v('blacharstwo')}
+Oczekiwana kwota:       ${v('kwota')}
+
+📸 LINKI DO ZDJĘĆ
+${imageLinks}
+👤 KONTAKT
+Imię i nazwisko:        ${v('imie')}
+Email:                  ${v('email')}
+Telefon:                ${v('telefon')}
+Link otomoto:           ${v('otomoto')}`.trim();
+
+  document.querySelector('#sendingOverlay p').textContent = 'Wysyłanie formularza…';
+
+  const params = {
+    to_email: TARGET_EMAIL,
+    subject: `Wycena — ${v('imie')} | VIN: ${v('vin')}`,
+    message: body,
+    images_html: imageHtml || '<p>Brak zdjęć</p>',
+    from_name: v('imie'),
+    reply_to: v('email'),
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    document.getElementById('sendingOverlay').classList.remove('active');
+    document.getElementById('sec-4').classList.remove('active');
+    document.getElementById('success').classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+  } catch (err) {
+    document.getElementById('sendingOverlay').classList.remove('active');
+    document.getElementById('submitBtn').disabled = false;
+    alert('Błąd wysyłania: ' + (err.text || JSON.stringify(err)));
+  }
+
+}
+</script>
+</body>
+</html>
