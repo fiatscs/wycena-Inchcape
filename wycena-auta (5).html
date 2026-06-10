@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wycena pojazdu · BMW Inchcape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0b1f3a;--navy2:#132847;--blue:#1c69d4;--blue2:#1050a8;--ice:#e8f0fb;--silver:#f0f2f5;--line:#dde2ea;--text:#0d1b2a;--sub:#4b5a6e;--dim:#8a96a4;--white:#ffffff;--red:#d63030;--green:#0f9b58;--r:8px;--shadow:0 2px 12px rgba(11,31,58,.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--silver);color:var(--text);min-height:100vh}
+.hero{position:relative;min-height:360px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.hero__bg{position:absolute;inset:0;background:linear-gradient(170deg,rgba(11,31,58,.85) 0%,rgba(11,31,58,.55) 55%,rgba(11,31,58,.78) 100%),url('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1600&q=80') center/cover no-repeat}
+.hero__top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;z-index:2}
+.hero__wordmark{display:flex;align-items:center;gap:12px}
+.bmw-badge{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.35);overflow:hidden;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.bmw-badge span:nth-child(1){background:#fff}
+.bmw-badge span:nth-child(2){background:var(--blue)}
+.bmw-badge span:nth-child(3){background:var(--blue)}
+.bmw-badge span:nth-child(4){background:#fff}
+.hero__brand{color:rgba(255,255,255,.85);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;line-height:1.3}
+.hero__brand strong{display:block;font-size:15px;color:#fff;letter-spacing:.04em}
+.hero__content{position:relative;z-index:2;padding:0 40px 44px}
+.hero__eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);border-radius:20px;padding:5px 14px 5px 8px;margin-bottom:18px}
+.hero__dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.hero__eyebrow span{font-size:11px;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:.08em;text-transform:uppercase}
+.hero__h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.8rem,7vw,5rem);font-weight:800;color:#fff;line-height:.96;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:14px}
+.hero__h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.55)}
+.hero__sub{color:rgba(255,255,255,.65);font-size:14px;max-width:420px;line-height:1.6}
+.rail{background:var(--navy);padding:0 40px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.rail__inner{max-width:860px;margin:0 auto;display:flex;align-items:stretch;height:56px;position:relative}
+.rail__step{flex:1;display:flex;align-items:center;gap:10px;padding:0 4px;border-bottom:3px solid transparent;transition:border-color .3s;cursor:default}
+.rail__step.active{border-bottom-color:var(--blue)}
+.rail__step.done{border-bottom-color:var(--green);cursor:pointer}
+.rail__num{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.4);flex-shrink:0;transition:all .3s;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em}
+.rail__step.active .rail__num{background:var(--blue);color:#fff}
+.rail__step.done .rail__num{background:var(--green);color:#fff}
+.rail__label{font-size:11px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em;transition:color .3s;white-space:nowrap}
+.rail__step.active .rail__label{color:rgba(255,255,255,.9)}
+.rail__step.done .rail__label{color:rgba(255,255,255,.6)}
+.rail__bar{height:3px;background:rgba(255,255,255,.08);position:absolute;bottom:0;left:0;width:100%}
+.rail__fill{height:100%;background:var(--blue);transition:width .5s ease}
+.main{max-width:860px;margin:0 auto;padding:36px 20px 80px}
+.section{display:none;animation:up .3s ease}
+.section.active{display:block}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.section__head{margin-bottom:28px}
+.section__num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.section__title{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;text-transform:uppercase;color:var(--navy);line-height:1;letter-spacing:.01em}
+.section__desc{margin-top:6px;font-size:13.5px;color:var(--sub);line-height:1.55}
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:28px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card__label{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card__label::after{content:'';flex:1;height:1px;background:var(--line)}
+.scan-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:20px;margin-bottom:16px;cursor:pointer;transition:transform .15s,box-shadow .15s;border:1px solid rgba(28,105,212,.3);position:relative;overflow:hidden}
+.scan-banner::before{content:'';position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(28,105,212,.12)}
+.scan-banner:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(11,31,58,.18)}
+.scan-banner__icon{width:52px;height:52px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+.scan-banner__text{flex:1}
+.scan-banner__title{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:700;text-transform:uppercase;color:#fff;letter-spacing:.04em;margin-bottom:3px}
+.scan-banner__sub{font-size:12px;color:rgba(255,255,255,.55);line-height:1.4}
+.scan-banner__arrow{color:rgba(255,255,255,.4);font-size:1.4rem;flex-shrink:0}
+.scanned-pill{display:none;align-items:center;gap:8px;background:#dcfce7;border:1px solid #bbf7d0;border-radius:6px;padding:8px 14px;margin-bottom:16px;font-size:13px;font-weight:600;color:#166534}
+.scanned-pill.show{display:flex}
+.scanned-pill__rescan{margin-left:auto;background:none;border:1px solid #86efac;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:600;color:#166534;cursor:pointer}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field__label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--sub);letter-spacing:.04em;text-transform:uppercase;margin-bottom:7px}
+.field__label .req{color:var(--blue);font-size:14px;line-height:1}
+.field__label .auto-tag{background:var(--ice);color:var(--blue);font-size:10px;font-weight:700;letter-spacing:.06em;padding:1px 7px;border-radius:10px;text-transform:uppercase;border:1px solid rgba(28,105,212,.2)}
+.field input,.field select,.field textarea{width:100%;background:var(--silver);border:1.5px solid var(--line);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;padding:11px 14px;outline:none;transition:border-color .2s,background .2s,box-shadow .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(28,105,212,.09)}
+.field input.autofilled{border-color:var(--green);background:#f0fdf4}
+.field textarea{resize:vertical;min-height:82px}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234b5a6e' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;cursor:pointer}
+.field__hint{font-size:11.5px;color:var(--dim);margin-top:5px;line-height:1.4}
+.field__error{font-size:11.5px;color:var(--red);margin-top:5px;display:none}
+.field__error.show{display:block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:580px){.g2,.g3{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--sub);background:var(--silver);transition:all .18s;user-select:none}
+.chip input{display:none}
+.chip:hover{border-color:var(--blue);color:var(--text)}
+.chip.selected{border-color:var(--blue);background:var(--ice);color:var(--navy);font-weight:600}
+.chip__dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);transition:all .18s;flex-shrink:0}
+.chip.selected .chip__dot{border-color:var(--blue);background:var(--blue);box-shadow:inset 0 0 0 2px #fff}
+.upload-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--silver);position:relative}
+.upload-zone:hover{border-color:var(--blue);background:var(--ice)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone__icon{font-size:2rem;margin-bottom:8px;display:block}
+.upload-zone__title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.upload-zone__sub{font-size:12px;color:var(--dim)}
+.thumb-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.thumb-wrap{position:relative}
+.thumb-wrap img{width:80px;height:80px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line);display:block}
+.thumb-wrap button{position:absolute;top:-6px;right:-6px;background:var(--red);border:none;color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.nav{display:flex;gap:12px;margin-top:28px}
+.btn-back{background:var(--white);border:1.5px solid var(--line);color:var(--sub);border-radius:var(--r);padding:13px 22px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s}
+.btn-back:hover{border-color:var(--navy);color:var(--navy)}
+.btn-next{flex:1;background:var(--blue);border:none;color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background .18s,transform .12s;letter-spacing:.02em}
+.btn-next:hover{background:var(--blue2)}
+.btn-next:active{transform:scale(.98)}
+.btn-next:disabled{opacity:.45;cursor:not-allowed}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line);gap:12px}
+.sum-row:last-child{border-bottom:none}
+.sum-row__k{font-size:12px;color:var(--dim);white-space:nowrap}
+.sum-row__v{font-size:13px;font-weight:600;color:var(--navy);text-align:right}
+.success{display:none;text-align:center;padding:60px 24px}
+.success.show{display:block}
+.success__ring{width:88px;height:88px;border-radius:50%;background:#dcfce7;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:2.6rem;margin:0 auto 28px;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.success__h{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+.success__p{font-size:15px;color:var(--sub);line-height:1.6;max-width:380px;margin:0 auto}
+.modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:18px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.modal__head{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal__title{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:700;text-transform:uppercase;color:#fff;letter-spacing:.05em}
+.modal__close{width:32px;height:32px;background:rgba(255,255,255,.1);border:none;border-radius:50%;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s}
+.modal__close:hover{background:rgba(255,255,255,.2)}
+.modal__video-wrap{position:relative;background:#000}
+#scan-video{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.modal__reticle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.reticle{width:58%;aspect-ratio:1;position:relative}
+.reticle::before{content:'';position:absolute;inset:0;box-shadow:0 0 0 2000px rgba(0,0,0,.45);border-radius:4px}
+.reticle__corner{position:absolute;width:22px;height:22px;border-color:var(--blue);border-style:solid;border-width:0}
+.reticle__corner--tl{top:0;left:0;border-top-width:3px;border-left-width:3px;border-radius:3px 0 0 0}
+.reticle__corner--tr{top:0;right:0;border-top-width:3px;border-right-width:3px;border-radius:0 3px 0 0}
+.reticle__corner--bl{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 3px}
+.reticle__corner--br{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 3px 0}
+.scan-line{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);animation:scanline 2.2s linear infinite}
+@keyframes scanline{0%{top:2px}100%{top:calc(100% - 2px)}}
+.modal__status{padding:10px 20px;font-size:13px;font-weight:500;color:var(--sub);text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center}
+.modal__hint{padding:12px 20px 18px;font-size:12px;color:var(--dim);text-align:center;line-height:1.5;border-top:1px solid var(--line)}
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(11,31,58,.7);backdrop-filter:blur(3px);flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.overlay.show{display:flex}
+.spinner{width:46px;height:46px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay p{color:#fff;font-size:14px;font-weight:500}
+.req-note{font-size:11.5px;color:var(--dim);margin-bottom:20px}
+.req-note span{color:var(--blue)}
+@media(max-width:520px){.card{padding:20px 16px}.main{padding:24px 16px 80px}.hero__top{padding:16px 20px}.hero__content{padding:0 20px 36px}.rail{padding:0 16px}.rail__label{display:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__top">
+    <div class="hero__wordmark">
+      <div class="bmw-badge"><span></span><span></span><span></span><span></span></div>
+      <div class="hero__brand"><strong>BMW Inchcape</strong>Motor Polska</div>
+    </div>
+  </div>
+  <div class="hero__content">
+    <div class="hero__eyebrow"><div class="hero__dot"></div><span>Bezplatna wycena</span></div>
+    <h1 class="hero__h1">Ile warte<br>jest Twoje <em>auto?</em></h1>
+    <p class="hero__sub">Wypelnij formularz — nasz doradca przygotuje wycene i skontaktuje sie z Toba bez zbednych formalnosci.</p>
+  </div>
+</header>
+
+<nav class="rail">
+  <div class="rail__inner">
+    <div class="rail__step active" id="si-1" onclick="tryGoTo(1)"><div class="rail__num" id="sn-1">1</div><div class="rail__label">Pojazd</div></div>
+    <div class="rail__step" id="si-2" onclick="tryGoTo(2)"><div class="rail__num" id="sn-2">2</div><div class="rail__label">Historia</div></div>
+    <div class="rail__step" id="si-3" onclick="tryGoTo(3)"><div class="rail__num" id="sn-3">3</div><div class="rail__label">Zdjecia</div></div>
+    <div class="rail__step" id="si-4" onclick="tryGoTo(4)"><div class="rail__num" id="sn-4">4</div><div class="rail__label">Kontakt</div></div>
+    <div class="rail__bar"><div class="rail__fill" id="railFill" style="width:25%"></div></div>
+  </div>
+</nav>
+
+<main class="main">
+  <p class="req-note"><span>*</span> pola obowiazkowe</p>
+
+  <div class="section active" id="sec-1">
+    <div class="section__head">
+      <div class="section__num">Krok 01 / 04</div>
+      <div class="section__title">Dane pojazdu</div>
+      <div class="section__desc">Skorzystaj ze skanera kodu Aztec z dowodu rejestracyjnego — formularz wypelni sie automatycznie. Mozesz tez wpisac dane recznie.</div>
+    </div>
+    <div class="scan-banner" onclick="openScanner()">
+      <div class="scan-banner__icon">&#x2B1B;</div>
+      <div class="scan-banner__text">
+        <div class="scan-banner__title">Skanuj kod Aztec z DR</div>
+        <div class="scan-banner__sub">Skieruj kamere na kwadratowy kod na awersie dowodu rejestracyjnego — dane wypelnia sie automatycznie</div>
+      </div>
+      <div class="scan-banner__arrow">&#x2192;</div>
+    </div>
+    <div class="scanned-pill" id="scannedPill">
+      <span>&#x2713;</span> Dane odczytane ze skanera &mdash; mozesz je edytowac ponizej
+      <button class="scanned-pill__rescan" onclick="openScanner()">Skanuj ponownie</button>
+    </div>
+    <div class="card">
+      <div class="card__label">Identyfikacja</div>
+      <div class="field">
+        <div class="field__label">Numer VIN <span class="req">*</span> <span class="auto-tag" id="vin-tag" style="display:none">auto</span></div>
+        <input type="text" id="vin" placeholder="np. WBA3A5C50DF123456" maxlength="17" style="font-family:monospace;letter-spacing:.05em">
+        <div class="field__hint">17-znakowy numer identyfikacyjny pojazdu</div>
+        <div class="field__error" id="err-vin">Prosze podac numer VIN</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Szczegoly rejestracji</div>
+      <div class="g3" style="margin-bottom:16px">
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Marka <span class="req">*</span> <span class="auto-tag" id="marka-tag" style="display:none">auto</span></div>
+          <input type="text" id="marka" placeholder="np. BMW">
+          <div class="field__error" id="err-marka">Wymagane</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Model <span class="auto-tag" id="model-tag" style="display:none">auto</span></div>
+          <input type="text" id="model" placeholder="np. 520d">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Rok produkcji <span class="req">*</span> <span class="auto-tag" id="rok-tag" style="display:none">auto</span></div>
+          <input type="number" id="rok" placeholder="2019" min="1990" max="2030">
+          <div class="field__error" id="err-rok">Wymagane</div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Data pierwszej rejestracji <span class="req">*</span> <span class="auto-tag" id="rej-tag" style="display:none">auto</span></div>
+          <input type="date" id="rejestracja">
+          <div class="field__error" id="err-rej">Wymagane</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Przebieg (km) <span class="req">*</span></div>
+          <input type="number" id="przebieg" placeholder="np. 85000">
+          <div class="field__error" id="err-przebieg">Wymagane</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Sposob sprzedazy</div>
+      <div class="chips">
+        <label class="chip" onclick="pickChip(this,'sprzedaz')"><input type="radio" name="sprzedaz" value="Faktura VAT"><div class="chip__dot"></div>Faktura VAT</label>
+        <label class="chip" onclick="pickChip(this,'sprzedaz')"><input type="radio" name="sprzedaz" value="Faktura VAT ZW"><div class="chip__dot"></div>Faktura VAT ZW</label>
+        <label class="chip" onclick="pickChip(this,'sprzedaz')"><input type="radio" name="sprzedaz" value="Osoba prywatna"><div class="chip__dot"></div>Osoba prywatna</label>
+      </div>
+      <div class="field__error" id="err-sprzedaz" style="margin-top:8px">Prosze wybrac sposob sprzedazy</div>
+    </div>
+    <div class="nav"><button class="btn-next" onclick="goTo(2)">Dalej &#x2014; Historia i stan &#x2192;</button></div>
+  </div>
+
+  <div class="section" id="sec-2">
+    <div class="section__head">
+      <div class="section__num">Krok 02 / 04</div>
+      <div class="section__title">Historia i stan</div>
+      <div class="section__desc">Informacje o historii serwisowej i stanie technicznym pojazdu.</div>
+    </div>
+    <div class="card">
+      <div class="card__label">Wlasnosc i pochodzenie</div>
+      <div class="g2" style="margin-bottom:0">
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Ktorym jest Pan/Pani wlascicielem? <span class="req">*</span></div>
+          <select id="wlasciciel">
+            <option value="">&#x2014; wybierz &#x2014;</option>
+            <option>Pierwszy</option><option>Drugi</option><option>Trzeci</option><option>Czwarty lub kolejny</option>
+          </select>
+          <div class="field__error" id="err-wlasciciel">Wymagane</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Samochod z polskiego salonu? <span class="req">*</span></div>
+          <div class="chips" style="margin-top:2px">
+            <label class="chip" onclick="pickChip(this,'salon')"><input type="radio" name="salon" value="Tak"><div class="chip__dot"></div>Tak</label>
+            <label class="chip" onclick="pickChip(this,'salon')"><input type="radio" name="salon" value="Nie"><div class="chip__dot"></div>Nie</label>
+            <label class="chip" onclick="pickChip(this,'salon')"><input type="radio" name="salon" value="Nie wiem"><div class="chip__dot"></div>Nie wiem</label>
+          </div>
+          <div class="field__error" id="err-salon">Wymagane</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Serwis i dokumentacja</div>
+      <div class="field">
+        <div class="field__label">Serwisowany tylko w ASO? <span class="req">*</span></div>
+        <div class="chips">
+          <label class="chip" onclick="pickChip(this,'aso')"><input type="radio" name="aso" value="Tak, wylacznie ASO"><div class="chip__dot"></div>Wylacznie ASO</label>
+          <label class="chip" onclick="pickChip(this,'aso')"><input type="radio" name="aso" value="Czesiowo ASO"><div class="chip__dot"></div>Czesiowo ASO</label>
+          <label class="chip" onclick="pickChip(this,'aso')"><input type="radio" name="aso" value="Nie, serwis poza ASO"><div class="chip__dot"></div>Poza ASO</label>
+        </div>
+        <div class="field__error" id="err-aso">Wymagane</div>
+      </div>
+      <div class="g2">
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Ksiazka serwisowa? <span class="req">*</span></div>
+          <div class="chips">
+            <label class="chip" onclick="pickChip(this,'ksiazka')"><input type="radio" name="ksiazka" value="Tak"><div class="chip__dot"></div>Tak</label>
+            <label class="chip" onclick="pickChip(this,'ksiazka')"><input type="radio" name="ksiazka" value="Nie"><div class="chip__dot"></div>Nie</label>
+          </div>
+          <div class="field__error" id="err-ksiazka">Wymagane</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Drugi komplet opon/kol? <span class="req">*</span></div>
+          <div class="chips">
+            <label class="chip" onclick="pickChip(this,'opony')"><input type="radio" name="opony" value="Tak"><div class="chip__dot"></div>Tak</label>
+            <label class="chip" onclick="pickChip(this,'opony')"><input type="radio" name="opony" value="Nie"><div class="chip__dot"></div>Nie</label>
+          </div>
+          <div class="field__error" id="err-opony">Wymagane</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Stan i oczekiwania</div>
+      <div class="field">
+        <div class="field__label">Naprawy blacharsko-lakiernicze?</div>
+        <textarea id="blacharstwo" placeholder="Opisz ewentualne naprawy lub wpisz 'Brak'"></textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="field__label">Oczekiwana kwota <span class="req">*</span></div>
+        <input type="text" id="kwota" placeholder="np. 45 000 zl lub 'otwarte na oferte'">
+        <div class="field__error" id="err-kwota">Wymagane</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(1)">&#x2190; Wróc</button>
+      <button class="btn-next" onclick="goTo(3)">Dalej &#x2014; Zdjecia &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="section" id="sec-3">
+    <div class="section__head">
+      <div class="section__num">Krok 03 / 04</div>
+      <div class="section__title">Zdjecia</div>
+      <div class="section__desc">Minimum 3 fotografie pojazdu oraz obie strony dowodu rejestracyjnego. Zdjecia ze smartfona sa w porzadku.</div>
+    </div>
+    <div class="card">
+      <div class="card__label">Fotografie pojazdu</div>
+      <div class="upload-zone">
+        <input type="file" accept="image/*" multiple onchange="handleFiles(event,'auto')">
+        <span class="upload-zone__icon">&#x1F4F8;</span>
+        <div class="upload-zone__title">Kliknij lub przeciagnij zdjecia</div>
+        <div class="upload-zone__sub">Przod, tyl, boki, wnetrze, ewentualne uszkodzenia &middot; min. 3 zdjecia</div>
+      </div>
+      <div class="thumb-grid" id="preview-auto"></div>
+      <div class="field__error" id="err-auto" style="margin-top:8px">Prosze dodac co najmniej 3 zdjecia pojazdu</div>
+    </div>
+    <div class="card">
+      <div class="card__label">Dowod rejestracyjny</div>
+      <div class="upload-zone">
+        <input type="file" accept="image/*" multiple onchange="handleFiles(event,'dr')">
+        <span class="upload-zone__icon">&#x1FA96;</span>
+        <div class="upload-zone__title">Kliknij lub przeciagnij zdjecia</div>
+        <div class="upload-zone__sub">Awers i rewers dowodu rejestracyjnego</div>
+      </div>
+      <div class="thumb-grid" id="preview-dr"></div>
+      <div class="field__error" id="err-dr" style="margin-top:8px">Prosze dodac zdjecia dowodu rejestracyjnego</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(2)">&#x2190; Wróc</button>
+      <button class="btn-next" onclick="goTo(4)">Dalej &#x2014; Kontakt &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="section" id="sec-4">
+    <div class="section__head">
+      <div class="section__num">Krok 04 / 04</div>
+      <div class="section__title">Dane kontaktowe</div>
+      <div class="section__desc">Ostatni krok &#x2014; podaj dane do kontaktu i sprawdz podsumowanie przed wyslaniem.</div>
+    </div>
+    <div class="card">
+      <div class="card__label">Kontakt</div>
+      <div class="field">
+        <div class="field__label">Imie i nazwisko <span class="req">*</span></div>
+        <input type="text" id="imie" placeholder="Jan Kowalski">
+        <div class="field__error" id="err-imie">Wymagane</div>
+      </div>
+      <div class="g2">
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Adres email <span class="req">*</span></div>
+          <input type="email" id="email" placeholder="jan@kowalski.pl">
+          <div class="field__error" id="err-email">Prosze podac poprawny adres email</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field__label">Telefon</div>
+          <input type="tel" id="telefon" placeholder="+48 500 000 000">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Link otomoto (opcjonalnie)</div>
+      <div class="field" style="margin-bottom:0">
+        <input type="url" id="otomoto" placeholder="https://www.otomoto.pl/osobowe/...">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__label">Podsumowanie &#x2014; sprawdz przed wyslaniem</div>
+      <div id="summary"></div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(3)">&#x2190; Wróc</button>
+      <button class="btn-next" id="submitBtn" onclick="submitForm()">Wyslij formularz wyceny &#x2713;</button>
+    </div>
+  </div>
+
+  <div class="success" id="success">
+    <div class="success__ring">&#x2713;</div>
+    <div class="success__h">Formularz wyslany!</div>
+    <p class="success__p">Dziekujemy &#x2014; nasz doradca skontaktuje sie z Toba mozliwie szybko z wycena Twojego samochodu.</p>
+  </div>
+</main>
+
+<div class="modal-bg" id="scanModal">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__title">&#x1F4F7; Skanuj kod Aztec</div>
+      <button class="modal__close" onclick="closeScanner()">&#x00D7;</button>
+    </div>
+    <div class="modal__video-wrap">
+      <video id="scan-video" autoplay playsinline muted></video>
+      <div class="modal__reticle">
+        <div class="reticle">
+          <div class="scan-line"></div>
+          <div class="reticle__corner reticle__corner--tl"></div>
+          <div class="reticle__corner reticle__corner--tr"></div>
+          <div class="reticle__corner reticle__corner--bl"></div>
+          <div class="reticle__corner reticle__corner--br"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal__status" id="scanStatus">Uruchamianie kamery...</div>
+    <div class="modal__hint">Kod Aztec to <strong>kwadratowy kod</strong> w prawym dolnym rogu awersu dowodu rejestracyjnego.<br>Przybliz kamere tak, by kod wypelnial ramke.</div>
+  </div>
+</div>
+
+<div class="overlay" id="sendOverlay">
+  <div class="spinner"></div>
+  <p id="overlayMsg">Przesylanie zdiec...</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.1/umd/index.min.js"></script>
+<script>
+const TARGET_EMAIL='andrzej.bmw.inchcape@gmail.com';
+const EMAILJS_SERVICE_ID='service_fqu9gyn';
+const EMAILJS_TEMPLATE_ID='template_cnfrnrb';
+const EMAILJS_PUBLIC_KEY='DqnWEW7VO63_xlpuc';
+const IMGBB_API_KEY='298f5ed8842d7c96942d4aadbc9e433f';
+emailjs.init(EMAILJS_PUBLIC_KEY);
+let cur=1;
+const filesMap={auto:[],dr:[]};
+
+function tryGoTo(s){const el=document.getElementById('si-'+s);if(el.classList.contains('done')||s<cur)goTo(s,true);}
+
+function goTo(step,skip){
+  if(step>cur&&!skip&&!validate(cur))return;
+  if(step===4)buildSummary();
+  document.getElementById('sec-'+cur).classList.remove('active');
+  document.getElementById('si-'+cur).classList.remove('active');
+  if(step>cur){document.getElementById('si-'+cur).classList.add('done');document.getElementById('sn-'+cur).textContent='✓';}
+  else{document.getElementById('si-'+cur).classList.remove('done');document.getElementById('sn-'+cur).textContent=cur;}
+  cur=step;
+  document.getElementById('sec-'+cur).classList.add('active');
+  document.getElementById('si-'+cur).classList.add('active');
+  document.getElementById('sn-'+cur).classList.remove('done');
+  document.getElementById('railFill').style.width=(cur/4*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validate(step){
+  let ok=true;
+  const err=(id,show)=>{const el=document.getElementById(id);if(el){el.classList[show?'add':'remove']('show');if(show)ok=false;}};
+  const val=id=>(document.getElementById(id)?.value||'').trim();
+  const rad=n=>!!document.querySelector('input[name="'+n+'"]:checked');
+  if(step===1){err('err-vin',!val('vin'));err('err-marka',!val('marka'));err('err-rok',!val('rok'));err('err-rej',!val('rejestracja'));err('err-przebieg',!val('przebieg'));err('err-sprzedaz',!rad('sprzedaz'));}
+  if(step===2){err('err-wlasciciel',!val('wlasciciel'));err('err-salon',!rad('salon'));err('err-aso',!rad('aso'));err('err-ksiazka',!rad('ksiazka'));err('err-opony',!rad('opony'));err('err-kwota',!val('kwota'));}
+  if(step===3){err('err-auto',filesMap.auto.length<3);err('err-dr',filesMap.dr.length<1);}
+  if(step===4){err('err-imie',!val('imie'));const e=val('email');err('err-email',!e||!/^\S+@\S+\.\S+$/.test(e));}
+  return ok;
+}
+
+function pickChip(el,name){
+  document.querySelectorAll('input[name="'+name+'"]').forEach(r=>r.closest('.chip').classList.remove('selected'));
+  el.classList.add('selected');el.querySelector('input').checked=true;
+}
+
+function handleFiles(e,key){filesMap[key].push(...Array.from(e.target.files));renderPreviews(key);}
+function renderPreviews(key){
+  const c=document.getElementById('preview-'+key);c.innerHTML='';
+  filesMap[key].forEach((f,i)=>{
+    const url=URL.createObjectURL(f),w=document.createElement('div');
+    w.className='thumb-wrap';
+    w.innerHTML='<img src="'+url+'" alt=""><button onclick="rmFile(\''+key+'\','+i+')">×</button>';
+    c.appendChild(w);
+  });
+}
+function rmFile(key,idx){filesMap[key].splice(idx,1);renderPreviews(key);}
+
+function buildSummary(){
+  const v=id=>document.getElementById(id)?.value?.trim()||'—';
+  const rad=n=>document.querySelector('input[name="'+n+'"]:checked')?.value||'—';
+  const rows=[
+    ['Marka / Model',v('marka')+' '+v('model')],['VIN',v('vin')],
+    ['Rok produkcji',v('rok')],['Pierwsza rejestracja',v('rejestracja')],
+    ['Przebieg',v('przebieg')!=='—'?v('przebieg')+' km':'—'],
+    ['Sposob sprzedazy',rad('sprzedaz')],['Wlasciciel',v('wlasciciel')],
+    ['Polski salon',rad('salon')],['Serwis ASO',rad('aso')],
+    ['Ksiazka serwisowa',rad('ksiazka')],['Drugi komplet opon',rad('opony')],
+    ['Naprawy blacharskie',v('blacharstwo')],['Oczekiwana kwota',v('kwota')],
+    ['Zdjecia pojazdu',filesMap.auto.length+' szt.'],['Zdjecia dowodu rej.',filesMap.dr.length+' szt.'],
+  ];
+  document.getElementById('summary').innerHTML=rows.map(([k,v])=>'<div class="sum-row"><span class="sum-row__k">'+k+'</span><span class="sum-row__v">'+v+'</span></div>').join('');
+}
+
+let zxing=null;
+function openScanner(){
+  document.getElementById('scanModal').classList.add('open');
+  document.getElementById('scanStatus').textContent='Uruchamianie kamery...';
+  try{
+    zxing=new ZXing.BrowserMultiFormatReader();
+    zxing.decodeFromVideoDevice(null,'scan-video',(result,err)=>{
+      if(result){
+        document.getElementById('scanStatus').textContent='✓ Kod odczytany!';
+        parseAztec(result.getText());
+        setTimeout(closeScanner,600);
+      } else {
+        document.getElementById('scanStatus').textContent='Skieruj kamere na kod Aztec...';
+      }
+    });
+  }catch(e){document.getElementById('scanStatus').textContent='Blad: '+e.message;}
+}
+
+function closeScanner(){
+  if(zxing){try{zxing.reset();}catch(e){}zxing=null;}
+  const v=document.getElementById('scan-video');
+  if(v&&v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null;}
+  document.getElementById('scanModal').classList.remove('open');
+}
+
+function parseAztec(raw){
+  let filled=0;
+  function setF(id,val,tagId){
+    if(!val)return;
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.value=val;el.classList.add('autofilled');
+    if(tagId){const t=document.getElementById(tagId);if(t)t.style.display='inline-flex';}
+    filled++;
+  }
+  const clean=raw.replace(/[\x00-\x08\x0b\x0e-\x1f]/g,'\n').replace(/\r/g,'\n');
+  const vinRx=clean.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
+  if(vinRx)setF('vin',vinRx[1].toUpperCase(),'vin-tag');
+  const d1=clean.match(/\b(20\d{2})[.\-\/](\d{2})[.\-\/](\d{2})\b/);
+  const d2=clean.match(/\b(\d{2})[.\-\/](\d{2})[.\-\/](20\d{2})\b/);
+  const d3=clean.match(/\b(20\d{2})(\d{2})(\d{2})\b/);
+  let dateStr=null;
+  if(d1)dateStr=d1[1]+'-'+d1[2]+'-'+d1[3];
+  else if(d2)dateStr=d2[3]+'-'+d2[2]+'-'+d2[1];
+  else if(d3)dateStr=d3[1]+'-'+d3[2]+'-'+d3[3];
+  if(dateStr){setF('rejestracja',dateStr,'rej-tag');setF('rok',dateStr.substring(0,4),'rok-tag');}
+  const markaRx=clean.match(/D\.?1[:\s\n]+([A-Z][A-Z\s\-]{1,20})/i);
+  if(markaRx)setF('marka',markaRx[1].trim(),'marka-tag');
+  const modelRx=clean.match(/D\.?3[:\s\n]+([A-Z0-9][A-Z0-9\s\-\.]{1,25})/i);
+  if(modelRx)setF('model',modelRx[1].trim(),'model-tag');
+  if(filled>0)document.getElementById('scannedPill').classList.add('show');
+  else document.getElementById('scanStatus').textContent='Nie rozpoznano danych — wpisz recznie.';
+}
+
+async function compress(file,w,q){w=w||1200;q=q||0.75;return new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{let iw=img.width,ih=img.height;if(iw>w){ih=Math.round(ih*w/iw);iw=w;}const c=document.createElement('canvas');c.width=iw;c.height=ih;c.getContext('2d').drawImage(img,0,0,iw,ih);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q).split(',')[1]);};img.onerror=rej;img.src=u;});}
+
+async function uploadImg(file){
+  const b64=await compress(file);
+  const fd=new FormData();fd.append('image',b64);
+  const r=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_API_KEY,{method:'POST',body:fd});
+  const d=await r.json();
+  if(d.success)return d.data.url;
+  throw new Error(JSON.stringify(d));
+}
+
+async function submitForm(){
+  if(!validate(4))return;
+  const ov=document.getElementById('sendOverlay'),msg=document.getElementById('overlayMsg');
+  ov.classList.add('show');
+  document.getElementById('submitBtn').disabled=true;
+  const v=id=>document.getElementById(id)?.value?.trim()||'—';
+  const rad=n=>document.querySelector('input[name="'+n+'"]:checked')?.value||'—';
+  const all=[...filesMap.auto,...filesMap.dr];
+  let imgLinks='',imgHtml='';
+  msg.textContent='Przesylanie zdiec (0/'+all.length+')...';
+  for(let i=0;i<all.length;i++){
+    try{
+      const url=await uploadImg(all[i]);
+      const lbl=i<filesMap.auto.length?'Pojazd '+(i+1):'Dowod rej. '+(i-filesMap.auto.length+1);
+      imgLinks+=lbl+': '+url+'\n';
+      imgHtml+='<div style="margin:10px 0"><b>'+lbl+':</b><br><a href="'+url+'"><img src="'+url+'" style="max-width:420px;border-radius:8px;margin-top:6px;border:1px solid #dde2ea"></a></div>';
+    }catch{imgLinks+='Zdjecie '+(i+1)+': blad\n';}
+    msg.textContent='Przesylanie zdiec ('+(i+1)+'/'+all.length+')...';
+  }
+  msg.textContent='Wysylanie formularza...';
+  const body=[
+    'WYCENA POJAZDU — BMW INCHCAPE',
+    '='.repeat(34),'',
+    'DANE POJAZDU',
+    '  Marka / Model:          '+v('marka')+' '+v('model'),
+    '  VIN:                    '+v('vin'),
+    '  Rok produkcji:          '+v('rok'),
+    '  Pierwsza rejestracja:   '+v('rejestracja'),
+    '  Przebieg:               '+v('przebieg')+' km',
+    '  Sposob sprzedazy:       '+rad('sprzedaz'),'',
+    'HISTORIA I STAN',
+    '  Wlasciciel:             '+v('wlasciciel'),
+    '  Polski salon:           '+rad('salon'),
+    '  Serwis ASO:             '+rad('aso'),
+    '  Ksiazka serwisowa:      '+rad('ksiazka'),
+    '  Drugi komplet opon:     '+rad('opony'),
+    '  Naprawy blacharskie:    '+v('blacharstwo'),
+    '  Oczekiwana kwota:       '+v('kwota'),'',
+    'ZDJECIA',imgLinks,
+    'KONTAKT',
+    '  Imie i nazwisko:        '+v('imie'),
+    '  Email:                  '+v('email'),
+    '  Telefon:                '+v('telefon'),
+    '  Link otomoto:           '+v('otomoto'),
+  ].join('\n');
+  try{
+    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
+      to_email:TARGET_EMAIL,
+      subject:'Wycena — '+v('marka')+' '+v('model')+' | '+v('imie')+' | VIN: '+v('vin'),
+      message:body,images_html:imgHtml||'<p>Brak zdiec</p>',
+      from_name:v('imie'),reply_to:v('email'),
+    });
+    ov.classList.remove('show');
+    document.getElementById('sec-4').classList.remove('active');
+    document.getElementById('success').classList.add('show');
+    document.getElementById('railFill').style.width='100%';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    ov.classList.remove('show');
+    document.getElementById('submitBtn').disabled=false;
+    alert('Blad wysylania: '+(err.text||JSON.stringify(err)));
+  }
+}
+</script>
+</body>
+</html>
